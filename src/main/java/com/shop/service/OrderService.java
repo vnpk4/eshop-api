@@ -1,13 +1,20 @@
 package com.shop.service;
 import com.shop.model.Cart;
+import com.shop.model.Product;
 import com.shop.repository.ProductRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Set;
+
+@Service
 public class OrderService {
-    private final ProductRepository productRepository;
+    @Autowired
+    private ProductRepository productRepository;
     private final Cart cart;
 
     public OrderService() {
-        this.productRepository = new ProductRepository();
         this.cart = new Cart();
     }
 
@@ -18,8 +25,10 @@ public class OrderService {
         else
             System.out.println("Quantity must be larger than 0!");
     }
-    public void printProductDetails()
+    public String printProductDetails()
     {
-        cart.showCart(productRepository.getAllProducts());
+        Set<Integer> purchasedIds = cart.getPurchaseProductIds();
+        List<Product> missingProducts = productRepository.findAllById(purchasedIds);
+        return cart.showCart(missingProducts);
     }
 }

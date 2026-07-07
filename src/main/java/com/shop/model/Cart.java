@@ -3,6 +3,8 @@ package com.shop.model;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 public class Cart {
     Map<Integer, Integer> items = new HashMap<>();
     public void addToCart(int productId, int quantity)
@@ -10,10 +12,15 @@ public class Cart {
         int currentQuantity = items.getOrDefault(productId,0);
         items.put(productId,quantity+currentQuantity);
     }
-    public void showCart(List<Product> storeProducts)
+    public Set<Integer> getPurchaseProductIds()
+    {
+        return this.items.keySet();
+    }
+    public String showCart(List<Product> storeProducts)
     {
         final double[] price = {0};
-        System.out.println("**********   GIỎ HÀNG CỦA BẠN   **********");
+        StringBuilder htmlResult = new StringBuilder();
+        htmlResult.append("**********   GIỎ HÀNG CỦA BẠN   **********\n");
         for(Map.Entry<Integer, Integer> entry : items.entrySet())
         {
             Product foundProduct = storeProducts.stream()
@@ -24,10 +31,14 @@ public class Cart {
             {
                 double subTotal = foundProduct.getPrice()* entry.getValue();
                 price[0] += subTotal;
-                System.out.println("Tên: "+foundProduct.getName()+" Giá: "+foundProduct.getPrice()+" Số lượng: "+entry.getValue()+" Thành tiền: "+subTotal);
+                String line = String.format("\nTên: %s | Giá: %.0f | Số lượng: %d | Thành tiền: %.0f VNĐ\n",
+                        foundProduct.getName(), foundProduct.getPrice(), entry.getValue(), subTotal);
+                htmlResult.append(line);
             }
         }
-        System.out.println("TỔNG TIỀN PHẢI THANH TOÁN LÀ: "+price[0]+" VNĐ");
+        String totalLine = String.format("\nTỔNG TIỀN PHẢI THANH TOÁN LÀ: %.0f VNĐ\n", price[0]);
+        htmlResult.append(totalLine);
+        return htmlResult.toString();
     }
 
 }
